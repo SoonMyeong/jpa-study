@@ -1,3 +1,5 @@
+package entity;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -6,7 +8,6 @@ import javax.persistence.Table;
 @Entity
 @Table(name="MEMBER")
 public class Member {
-
     @Id
     @Column(name = "ID")
     private String id;
@@ -15,6 +16,12 @@ public class Member {
     private String username;
 
     private Integer age;
+    public Member() {}
+    public Member(String id, String username, Integer age) {
+        this.id = id;
+        this.username = username;
+        this.age = age;
+    }
 
     public String getId() {
         return id;
