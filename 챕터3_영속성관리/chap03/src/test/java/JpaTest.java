@@ -136,4 +136,26 @@ public class JpaTest {
         //JPQL 쿼리 실행 시 auto flush가 작동 안한다면? -> DB 조회 결과는 없어야 한다. why? 플러시 안했으니까
         List<Member> members = em.createQuery("select m from Member m",Member.class).getResultList();
     }
+
+    /** 추가 **/
+    
+    @Test
+    @DisplayName("바로 merge 했을 경우, 이후 엔티티 값 변화 시 update 되지 않음, 관리되는 다른 인스턴스를 리턴 하므로")
+    void init_merge_test() {
+        EntityTransaction transaction = em.getTransaction();
+        transaction.begin();
+        em.merge(member);
+        member.setUsername("최초 머지");
+        transaction.commit();
+    }
+    
+    @Test
+    @DisplayName("merge 한 엔티티를 다른 인스턴스에 넣을 경우 (참조), 컨텍스트에서 관리 됨")
+    void merge_anther_instance() {
+        EntityTransaction transaction = em.getTransaction();
+        transaction.begin();
+        Member another = em.merge(member);
+        another.setUsername("다른 인스턴스에 넣은 후 setter 로 값 변경");
+        transaction.commit();
+    }
 }
