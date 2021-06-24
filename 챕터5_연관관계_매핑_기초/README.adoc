@@ -1,7 +1,7 @@
 = CHAPTER 5. Association Mapping
 
 
-== 5.1 단반향 연관관계
+== 5.1 단방향 연관관계
 
 == 5.2 연관관계 사용
 
