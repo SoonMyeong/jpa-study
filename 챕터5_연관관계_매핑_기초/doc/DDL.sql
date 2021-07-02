@@ -14,7 +14,7 @@ DROP TABLE IF exists TEAM;
 CREATE TABLE MEMBER(
                        MEMBER_ID BIGINT NOT NULL,
                        TEAM_ID BIGINT,
-                       USER_NAME VARCHAR(2555),
+                       USER_NAME VARCHAR(255),
                        PRIMARY KEY (MEMBER_ID)
 );
 
