@@ -1,16 +1,252 @@
 = CHAPTER 5. Association Mapping
+Our primary goals are object reference and table foreign key Mapping
 
+== Main point for Association mapping
+1. Direction    : 방향(단방향, 양방향)
+2. Multiplicity : 다중성(다대일, 일대다, 일대일, 다대다)
+3. Owner        : 연관관계의 주인
 
 == 5.1 단방향 연관관계
+1. 다대일 (N:1) 단방향 관계
+* 회원, 팀
+* 회원은 하나의 팀에만 소속
+* 회원과 팀은 다대일 관계
+
+객체 연관관계
+참조(주소)로 연관관계를 맺는다
+단방향이다(양방향은 서로 다른 단방향 2개를 생성)
+
+테이블 연관관계
+외래 키로 연관관계를 맺는다.
+양방향이다
+
+=== 5.1.1 순수한 객체 연관관계
+객체 그래프 탐색(참조값을 이용)
+
+=== 5.1.2 테이블 연관관계
+외래키를 이용한 연관관계 탐색(조인)
+
+=== 5.1.3 객체 관계 매핑
+@ManyToOne
+@JoinColumn
+
+=== 5.1.5 @ManyToOne
+
+* optional     : 기본값 true false 일 경우 연관된 엔티티가 항상 있어야 한다. (ex : team != null)
+* fetch        : 8장내용을 참조(!FetchType.EAGER(즉시로딩) or FetchType.LAZY(지연로딩, Proxy))
+* cascade      : 영속성 전이 기능(!CascadeType.PERSIST, ALL, DETACH, MERGE, REFRESH, REMOVE)
+* targetEntity : 거의 사용 X, 연관된 엔티티 TYPE 을 설정 (ex: targetEntity=Member.class);
+
+=== 5.1.4 @JoinColumn
+
+* name : 매핑할 외래키 이름 생략 가능, 기본값 : 필드명 + 언더바 + 참조하는 테이블의 컬럼명(ex : team_TEAM_ID)
+* referencedColumnName : 외래 키가 참조하는 대상 테이블의 테이블의 컬럼명(TEAM_ID)
+* foreignKey(DDL) 외래 키 제약조건을 직접 지정(테이블 생성시만 사용 속성)
+* ?unique, nullable, insertable, updatable, columnDefinition, table
+
+객체 연관관계 : 회원 객체의 Member.team 필드사용
+테이블 연관관계 : 회원 테이블의 MEMBER.TEAM_ID 외래 키 컬럼을 사용
+
+member.getTeam();
 
 == 5.2 연관관계 사용
+=== 5.2.1 저장
+Entity 를 저장할때 연관된 모든 Entity 는 영속 상태여야 한다
+
+[source,java,indent=0]
+----
+Team t1 = new Team(1L, '두산');
+em.persist(t1);
+
+Member m1 = new Member(1L, "회원1");
+m1.setTeam(t1);
+em.persist(m1);
+
+Member m2 = new Member(2L, "회원2");
+m2.setTeam(t1);
+em.persist(m2);
+
+
+
+
+----
+
+
+=== 5.2.2 조회
+* 객체 그래프 탐색 member.getTeam();
+* JPQL(Java Persistence Query Language)
+
+[source,java,indent=0]
+----
+public void sample(){
+    String jpql = "select m from Member m join m.team t where " + " t.name=:teamName";
+
+    List<Member> members = em.createQuery(jpql, Member.class)
+                             .setParameter("teamName", "두산")
+                             .getResultList();
+
+    for(Member m : members){
+        log.info(" member.username {}", m.getUserName()");
+    }
+}
+----
+
+=== 5.2.3 수정
+setTeam(team2)
+
+=== 5.2.4 연관관계 제거
+setTeam(null);
+
+
+=== 5.2.5 연관된 엔티티 삭제
+* 연관관계를 먼저 제거 하고 삭제( 외래 키 제약조건으로 인해 데이터베이스 오류)
+1. member1.setTeam(null);
+2. member2.setTeam(null);
+3. em.remove(team);
 
 == 5.3 양방향 연관관계
+회원 <--> 팀
+* 데이터 베이스 추가작업 X
+
+=== 5.3.1
+* 회원 엔티티 추가작업 X
+* 팀 엔티티에 @OnToMany(mappedBy = "team") Collection 속성추가
+* mappedBy : 양방향 매핑일때 반대쪽 매핑의 필드 이름 (연관관계 주인)
 
 == 5.4 연관관계의 주인
+* 엄밀하게는 객체에는 양방향 연관관계라는 개념 없음(단방향 연관관계각 2개)
+* 회원 -> 팀 (단방향)
+* 팀 -> 회원 (단방향)
+* 관리 포인트 2곳
+* 두 객체 연관관계 중 하나를 정해서 테이블의 외래키를 관리해야하는데 이것을 연관관계의 주인이라 한다.
+
+=== 5.4.1 양방향 매핑의 규칙: 연관관계의 주인
+* 연관관계 주인 : 외래키 관리(등록, 수정, 삭제)
+* 반대편 inverse, non-owning side(ex :team) : only readable (ex : team1.getMembers().add(member1); X)
+* 주인 mappedBy 속성 X
+* @ManyToOne 은 항상 연관관계의 주인 (@OneToMany 가 주인이 될 수 도 있음 : 성능상 이유 6.2.1절 이후 확인)
 
 == 5.5 양방향 연관관계 저장
+코드는 동일
+member1.setTeam(team1);
+member2.setTeam(team1);
 
 == 5.6 양방향 연관관계의 주의점
+* 연관관계의 주인에는 값을 입력하지 않고, 주인이 아닌 곳에만 값을 입력하는 경우 +
+`데이터베이스에 외래키 값이 정상적으로 저장되지 않으면 이것부터 의심!`
+
+[source,java,indent=1]
+----
+
+Member m1 = new Member(1L, "회원1");
+em.persist(m1);
+
+Member m2 = new Member(2L, "회원2");
+em.persist(m2);
+
+Team t1 = new Team(1L, '두산');
+t1.getMembers().add(t1);
+t1.getMembers().add(t2);
+em.persist(t1);
+
+----
+
+? 동작 확인? 외래키가 없어서 참조 에러 뜨지 않음 ?
+
+=== 5.6.1 순수한 객체까지 고려한 양방향 연관관계
+객체 관점에서 양쪽 방향에 모두 값을 입력해주는 것이 가장 안전, JPA를 사용하지 않는 순수한 객체 상태에서 심각한 문제 야기
+
+[source,java,indent=0]
+----
+Team t1 = new Team(1L, '두산');
+em.persist(t1);
+
+Member m1 = new Member(1L, "회원1");
+m1.setTeam(t1);
+t1.getMembers().add(m1);
+em.persist(m1);
+
+Member m2 = new Member(2L, "회원2");
+*m2.setTeam(t2);
+*t1.getMembers().add(m2);
+em.persist(m2);
+----
+
+
+=== 5.6.2 연관관계 편의 메소드
+
+member.setTeam(t1), team.getMembers().add(m1) 를 각 호출하다 보면
+실수로 둘 중 하나만 호출해서 양방향이 깨질 수 있다.
+
+[source,java,indent=0]
+----
+public class Member{
+    private Team team;
+
+    public void setTeam(Team team){
+        this.team = team;
+        team.getMembers().add(this);
+    }
+}
+
+----
+
+[source,java,indent=0]
+----
+Team t1 = new Team(1L, '두산');
+em.persist(t1);
+
+Member m1 = new Member(1L, "회원1");
+m1.setTeam(t1);
+em.persist(m1);
+
+Member m2 = new Member(2L, "회원2");
+m2.setTeam(t2);
+em.persist(m2);
+
+----
+
+=== 5.6.3 연관관계 편의 메소드 작성 시 주의 사항
+
+team 엔티티에 있는 멤버 list 에서 제거가 필요( 팀 -> 회원 연관관계 제거 )
+
+* 데이터베이스는 정상 반영
+* 영속성 컨텍스트가 아직 살아있는 상태에서 문제
+
+[source,java,indent=0]
+----
+public class Member{
+    private Team team;
+
+    public void setTeam(Team team){
+
+        if(this.team != null){
+            this.team.getMembers().remove(this);
+        }
+
+        this.team = team;
+        team.getMembers().add(this);
+    }
+}
+----
+
+
 
 == 5.7 정리
+양방향의 장점은 반대방향으로 객체 그래프 탐색 기능이 추가 된것 뿐
+* 단방향 매핑만으로 테이블과 객체의 연관관계 매핑은 이미 완료
+* 단방향을 양방향으로 만들면 반대방향으로 객체 그래프 탐색 기능이 추가
+* 양방향 연관관계를 매핑하려면 객체에서 양쪽 방향을 모두 관리
+
+* 연관관계의 주인을 정하는 기준
+* 단방향은 항상 외래키가 있는 곳을 기준으로 매핑
+* 주인은 외래키 관리자 정도로
+* 비지니스 중요도로 접근 하면 안됨
+
+!주의 양방향 매핑시 무한 루프
+Member.toString() -> getTeam();
+Team.toString() -> getMember();
+!Lombok 사용시도 주의
+
+// id값 이외의 값으로 조회 삭제 등등?
+//
