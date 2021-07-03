@@ -55,17 +55,22 @@ Entity 를 저장할때 연관된 모든 Entity 는 영속 상태여야 한다
 
 [source,java,indent=0]
 ----
-Team t1 = new Team(1L, '두산');
-em.persist(t1);
+public class Sample {
 
-Member m1 = new Member(1L, "회원1");
-m1.setTeam(t1);
-em.persist(m1);
+    public void saveRelation(){
 
-Member m2 = new Member(2L, "회원2");
-m2.setTeam(t1);
-em.persist(m2);
+        Team t1 = new Team(1L, '두산');
+        em.persist(t1);
 
+        Member m1 = new Member(1L, "회원1");
+        m1.setTeam(t1);
+        em.persist(m1);
+
+        Member m2 = new Member(2L, "회원2");
+        m2.setTeam(t1);
+        em.persist(m2);
+    }
+}
 
 
 
@@ -78,15 +83,17 @@ em.persist(m2);
 
 [source,java,indent=0]
 ----
-public void sample(){
-    String jpql = "select m from Member m join m.team t where " + " t.name=:teamName";
+public class Retrieve{
+    public void retrieve(){
+        String jpql = "select m from Member m join m.team t where " + " t.name=:teamName";
 
-    List<Member> members = em.createQuery(jpql, Member.class)
-                             .setParameter("teamName", "두산")
-                             .getResultList();
+        List<Member> members = em.createQuery(jpql, Member.class)
+                                 .setParameter("teamName", "두산")
+                                 .getResultList();
 
-    for(Member m : members){
-        log.info(" member.username {}", m.getUserName()");
+        for(Member m : members){
+            log.info(" member.username {}", m.getUserName());
+        }
     }
 }
 ----
@@ -138,17 +145,21 @@ member2.setTeam(team1);
 [source,java,indent=1]
 ----
 
-Member m1 = new Member(1L, "회원1");
-em.persist(m1);
+public class BidiSave{
+    public void bidiSave(){
 
-Member m2 = new Member(2L, "회원2");
-em.persist(m2);
+        Member m1 = new Member(1L, "회원1");
+        em.persist(m1);
 
-Team t1 = new Team(1L, '두산');
-t1.getMembers().add(t1);
-t1.getMembers().add(t2);
-em.persist(t1);
+        Member m2 = new Member(2L, "회원2");
+        em.persist(m2);
 
+        Team t1 = new Team(1L, '두산');
+        t1.getMembers().add(t1);
+        t1.getMembers().add(t2);
+        em.persist(t1);
+    }
+}
 ----
 
 ? 동작 확인? 외래키가 없어서 참조 에러 뜨지 않음 ?
@@ -158,18 +169,23 @@ em.persist(t1);
 
 [source,java,indent=0]
 ----
-Team t1 = new Team(1L, '두산');
-em.persist(t1);
+public class BidiWithEntity{
+    public void bidiWidthEntity(){
 
-Member m1 = new Member(1L, "회원1");
-m1.setTeam(t1);
-t1.getMembers().add(m1);
-em.persist(m1);
+        Team t1 = new Team(1L, '두산');
+        em.persist(t1);
 
-Member m2 = new Member(2L, "회원2");
-*m2.setTeam(t2);
-*t1.getMembers().add(m2);
-em.persist(m2);
+        Member m1 = new Member(1L, "회원1");
+        m1.setTeam(t1);
+        t1.getMembers().add(m1);
+        em.persist(m1);
+
+        Member m2 = new Member(2L, "회원2");
+        m2.setTeam(t2);
+        t1.getMembers().add(m2);
+        em.persist(m2);
+        }
+}
 ----
 
 
@@ -193,17 +209,21 @@ public class Member{
 
 [source,java,indent=0]
 ----
-Team t1 = new Team(1L, '두산');
-em.persist(t1);
+public class BidiConvenienceMethod{
+    public void bidiConvenienceMethod(){
 
-Member m1 = new Member(1L, "회원1");
-m1.setTeam(t1);
-em.persist(m1);
+        Team t1 = new Team(1L, '두산');
+        em.persist(t1);
 
-Member m2 = new Member(2L, "회원2");
-m2.setTeam(t2);
-em.persist(m2);
+        Member m1 = new Member(1L, "회원1");
+        m1.setTeam(t1);
+        em.persist(m1);
 
+        Member m2 = new Member(2L, "회원2");
+        m2.setTeam(t2);
+        em.persist(m2);
+    }
+}
 ----
 
 === 5.6.3 연관관계 편의 메소드 작성 시 주의 사항
