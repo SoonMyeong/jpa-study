@@ -127,17 +127,6 @@ class Chapter05ApplicationTests {
         tx.commit();
     }
 
-    @Test
-    @DisplayName("5.8 DELETE")
-    void deleteRelation() {
-        EntityTransaction tx  = em.getTransaction();
-        tx.begin();
-
-        Member m1 = em.find(Member.class, 1L);
-        m1.setTeam(null);
-
-        tx.commit();
-    }
 
     @Test
     @DisplayName("5.8 DELETE")
