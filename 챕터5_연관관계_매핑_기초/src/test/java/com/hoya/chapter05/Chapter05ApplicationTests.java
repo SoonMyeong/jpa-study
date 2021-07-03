@@ -95,9 +95,9 @@ class Chapter05ApplicationTests {
         Team team = em.find(Team.class, 1L);
         List<Member> members = team.getMembers();
 
-        log.info("members {}", members.size());
+        log.info("TEST@ >>  members : {}", members.size());
         for(Member m : members){
-            log.info("==================== {}", m.getUserName() );
+            log.info("TEST@ >>  member : {}", m.getUserName() );
         }
     }
 
@@ -111,7 +111,7 @@ class Chapter05ApplicationTests {
                 .setParameter("teamName", "두산").getResultList();
 
         for(Member m : resultMembers){
-            log.info("m.getUserName() {}", m.getUserName());
+            log.info("TEST@ >>  m.getUserName() {}", m.getUserName());
         }
     }
 
@@ -145,6 +145,105 @@ class Chapter05ApplicationTests {
         em.remove(t1);
 
         tx.commit();
+    }
+
+    @Test
+    @DisplayName("5.13 bidSave")
+    public void bidiSave(){
+        EntityTransaction tx  = em.getTransaction();
+        tx.begin();
+
+        Team t10 = new Team(10L, "삼성");
+        em.persist(t10);
+
+        Member m14 = new Member(14L, "member14");
+        m14.setTeam(t10);
+        em.persist(m14);
+
+        Member m15 = new Member(15L, "member15");
+        m15.setTeam(t10);
+        em.persist(m15);
+
+        tx.commit();
+
+        Member m14r = em.find(Member.class, 14L);
+        Member m15r = em.find(Member.class, 14L);
+
+        log.info("TEST@ >> m14r. {} {}",m14r.getUserName(), m14r.getTeam());
+        log.info("TEST@ >> m15r. {} {}}",m15.getUserName(),  m15r.getTeam());
+    }
+
+
+
+
+    @Test
+    @DisplayName("5.14 SaveNonOwner")
+    public void bidiSaveNonOwner(){
+        EntityTransaction tx  = em.getTransaction();
+        tx.begin();
+
+        Member m14 = new Member(14L, "member14");
+        em.persist(m14);
+
+        Member m15 = new Member(15L, "member15");
+        em.persist(m15);
+
+        Team t10 = new Team(10L, "삼성");
+        t10.getMembers().add(m14);
+        t10.getMembers().add(m15);
+
+        em.persist(t10);
+
+        tx.commit();
+
+
+        Member m14r = em.find(Member.class, 14L);
+        Member m15r = em.find(Member.class, 14L);
+
+        log.info("TEST@ >> m14r : {}", m14r.getTeam());
+        log.info("TEST@ >> m15r : {}", m15r.getTeam());
+    }
+
+    @Test
+    @DisplayName("5.16 bidiSavePureRelations")
+    public void bidiSavePureRelations(){
+
+        Team t10 = new Team(10L, "삼성");
+        Member m14 = new Member(14L, "member14");
+        Member m15 = new Member(15L, "member15");
+
+        m14.setTeam(t10);
+        t10.getMembers().add(m14);
+        m15.setTeam(t10);
+        t10.getMembers().add(m15);
+
+        log.info("TEST@ >>  : {} members: {}", t10, t10.getMembers());
+    }
+
+
+    @Test
+    @DisplayName("5.17 bidiSaveJPA_ORM")
+    public void bidiSaveJPA_ORM(){
+        EntityTransaction tx  = em.getTransaction();
+        tx.begin();
+
+        Team t10 = new Team(10L, "삼성");
+        em.persist(t10);
+
+        Member m14 = new Member(14L, "member14");
+        m14.setTeam(t10);
+        t10.getMembers().add(m14);
+        em.persist(m14);
+
+
+        Member m15 = new Member(15L, "member15");
+        m15.setTeam(t10);
+        t10.getMembers().add(m15);
+        em.persist(m15);
+
+        tx.commit();
+        Team t10r = em.find(Team.class, 10L);
+        log.info("TEST@ >>  : {} members: {}", t10r, t10r.getMembers());
     }
 
 

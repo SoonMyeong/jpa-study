@@ -147,22 +147,26 @@ member2.setTeam(team1);
 
 public class BidiSave{
     public void bidiSave(){
+        EntityTransaction tx  = em.getTransaction();
+        tx.begin();
 
-        Member m1 = new Member(1L, "회원1");
-        em.persist(m1);
+        Member m14 = new Member(14L, "member14");
+        em.persist(m14);
 
-        Member m2 = new Member(2L, "회원2");
-        em.persist(m2);
+        Member m15 = new Member(15L, "member15");
+        em.persist(m15);
 
-        Team t1 = new Team(1L, '두산');
-        t1.getMembers().add(t1);
-        t1.getMembers().add(t2);
-        em.persist(t1);
+        Team t10 = new Team(10L, "삼성");
+        t10.getMembers().add(m14);
+        t10.getMembers().add(m15);
+
+        em.persist(t10);
+
+        tx.commit();;
     }
 }
 ----
 
-? 동작 확인? 외래키가 없어서 참조 에러 뜨지 않음 ?
 
 === 5.6.1 순수한 객체까지 고려한 양방향 연관관계
 객체 관점에서 양쪽 방향에 모두 값을 입력해주는 것이 가장 안전, JPA를 사용하지 않는 순수한 객체 상태에서 심각한 문제 야기
