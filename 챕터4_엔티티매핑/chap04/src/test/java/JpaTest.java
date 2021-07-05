@@ -18,7 +18,7 @@ public class JpaTest {
     private EntityManagerFactory emf;
     private EntityManager em;
     private Member member;
-
+    
     @BeforeEach
     void setUp() {
         this.emf = Persistence.createEntityManagerFactory("jpabook");
