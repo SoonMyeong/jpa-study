@@ -2,5 +2,7 @@
 Our primary goals are object reference and table foreign key Mapping
 
 == Main point for Association mapping
-1. What difference Entity and Value Type
-
+1. What is the Value type
+2. What difference Entity and Value Type
+3. What have kind Value types
+4. How to use Value types
