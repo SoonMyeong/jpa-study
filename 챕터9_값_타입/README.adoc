@@ -1,0 +1,6 @@
+= CHAPTER 9. Value Type
+Our primary goals are object reference and table foreign key Mapping
+
+== Main point for Association mapping
+1. What difference Entity and Value Type
+
