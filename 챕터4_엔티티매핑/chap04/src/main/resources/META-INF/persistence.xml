@@ -13,7 +13,7 @@
 
 <!--            2021-06-19 자동 데이터베이스 프로퍼티 추가-->
 
-            <property name="hibernate.hbm2ddl.auto" value="create"/>
+<!--            <property name="hibernate.hbm2ddl.auto" value="create"/>-->
 
             <!-- 옵션 -->
             <property name="hibernate.show_sql" value="true" />
