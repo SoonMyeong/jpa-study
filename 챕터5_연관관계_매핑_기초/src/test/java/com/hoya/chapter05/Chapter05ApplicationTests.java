@@ -212,11 +212,11 @@ class Chapter05ApplicationTests {
         Member m14 = new Member(14L, "member14");
         Member m15 = new Member(15L, "member15");
 
+
         m14.setTeam(t10);
         t10.getMembers().add(m14);
         m15.setTeam(t10);
         t10.getMembers().add(m15);
-
         log.info("TEST@ >>  : {} members: {}", t10, t10.getMembers());
     }
 
