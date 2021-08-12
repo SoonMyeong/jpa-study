@@ -15,7 +15,7 @@ import javax.persistence.*;
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 
 //부모 클래스에 구분 컬럼을 지정 한다.
-//@DiscriminatorColumn(name = "DTYPE")
+@DiscriminatorColumn(name = "DTYPE")
 @Getter
 @Setter
 @NoArgsConstructor
